@@ -1,6 +1,7 @@
 // CoachHomePage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 
 const CoachHomePage = () => {
   const teams = ['Команда A', 'Команда Б'];
@@ -50,10 +51,39 @@ const CoachHomePage = () => {
               <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Тренер</div>
             </div>
           </div>
+          <button
+            onClick={() => console.log("Открыть настройки")}
+            style={{
+              backgroundColor: '#f1f5f9',
+              color: '#334155',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
+          >
+            ⚙ Настройки
+          </button>
+          <button
+            onClick={() => console.log("Выход")}
+            style={{
+              backgroundColor: '#fee2e286',
+              color: '#b91c1c',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
+          >
+          Выйти
+          </button>
         </div>
       </header>
 
-      {/* Основной контент */}
       <main style={{
         flex: 1,
         maxWidth: '1200px',
@@ -65,7 +95,6 @@ const CoachHomePage = () => {
         gap: '2rem',
         boxSizing: 'border-box'
       }}>
-        {/* Секция "Мои команды" */}
         <section style={{
           backgroundColor: 'white',
           padding: '1.75rem',
@@ -118,10 +147,29 @@ const CoachHomePage = () => {
                 </Link>
               </li>
             ))}
+            <li>
+            <button
+              onClick={() => console.log("Добавить команду")}
+              style={{
+                width: '100%',
+                padding: '0.9rem 1.25rem',
+                backgroundColor: '#036aa11f',
+                color: '#0369a1',
+                fontWeight: 500,
+                borderRadius: '12px',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.2s ease',
+                borderLeft: '3px solid #0ea5e9'
+              }}
+            >
+              ➕ Добавить команду
+            </button>
+          </li>
           </ul>
         </section>
 
-        {/* Секция "Общая статистика" */}
         <section style={{
           backgroundColor: 'white',
           padding: '1.75rem',
@@ -197,12 +245,11 @@ const CoachHomePage = () => {
             </div>
             <div>
               <div style={{ fontWeight: 500, color: '#1e293b' }}>Стабильный прогресс</div>
-              <div style={{ color: '#64748b', fontSize: '0.9rem' }}>Показатели улучшаются на 5% еженедельно</div>
+              <div style={{ color: '#64748b', fontSize: '0.9rem' }}>блаблаблаблабла</div>
             </div>
           </div>
         </section>
 
-        {/* Секция "Приглашение в команду" */}
         <section style={{
           backgroundColor: 'white',
           padding: '1.75rem',
@@ -242,7 +289,7 @@ const CoachHomePage = () => {
             backgroundColor: '#f5f3ff',
             borderRadius: '16px'
           }}>
-            <div style={{
+            {/* <div style={{
               width: '180px',
               height: '180px',
               backgroundColor: 'white',
@@ -267,11 +314,12 @@ const CoachHomePage = () => {
                   }}></div>
                 ))}
               </div>
-            </div>
-            
+            </div> */}
+            <QRCodeSVG value="https://example.com" />
+
             <h3 style={{ fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>Сканируйте QR-код</h3>
             <p style={{ color: '#64748b', lineHeight: 1.5 }}>
-              Отсканируйте код для присоединения к команде через мобильное приложение
+              Отсканируйте код для присоединения к команде через мобильное устройство
             </p>
           </div>
           
@@ -367,6 +415,29 @@ const CoachHomePage = () => {
           Узнать больше
         </button>
       </section>
+      <footer style={{
+          backgroundColor: '#f1f5f9',
+          padding: '2rem',
+          textAlign: 'center',
+          borderTop: '1px solid #e2e8f0',
+          color: '#64748b',
+          fontSize: '0.9rem',
+          marginTop: 'auto'
+      }}>
+          <p style={{
+              marginBottom: '0.5rem',
+              fontWeight: 500,
+              color: '#1e293b'
+          }}>
+              ChillRate © {new Date().getFullYear()}
+          </p>
+          <p style={{ marginBottom: '0.25rem' }}>
+              Сделано с заботой о командах и их прогрессе.
+          </p>
+          <p>
+              <a href="#" style={{ color: '#3b82f6', textDecoration: 'none' }}>Сайт компании "Нейротех"</a> · <a href="#" style={{ color: '#3b82f6', textDecoration: 'none' }}>Информация о датчике</a>
+          </p>
+      </footer>
 
     </div>
   );
