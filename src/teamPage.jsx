@@ -483,7 +483,7 @@ const DashboardLayout = () => (
           margin: 0,
           lineHeight: '1.2'
         }}>
-          <Link to={'/'} style={{ textDecoration: 'none' }}>ChillRate</Link>
+          <Link to={'/main'} style={{ textDecoration: 'none' }}>ChillRate</Link>
         </h1>
       </div>
 
@@ -499,7 +499,7 @@ const DashboardLayout = () => (
     <main style={{ 
       padding: '2rem',
       flex: 1,
-      background: 'linear-gradient(to right, #3b83f618, #8a5cf61c)',
+      background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
     }}>
       <CoachDashboard />
     </main>

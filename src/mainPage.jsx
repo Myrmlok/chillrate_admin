@@ -14,7 +14,7 @@ const CoachHomePage = () => {
       display: 'flex',
       flexDirection: 'column',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif",
-      background: 'linear-gradient(to right, #3b83f618, #8a5cf61c)',
+      background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
     }}>
       {/* Верхняя панель */}
       <header style={{
@@ -344,77 +344,7 @@ const CoachHomePage = () => {
         
       </main>
 
-      <section style={{
-        backgroundColor: '#fafafa',
-        padding: '2.5rem',
-        borderRadius: '20px',
-        boxShadow: '0 10px 30px rgba(99, 102, 241, 0.1)',
-        border: '1px solid #e0e7ff',
-        maxWidth: '720px',
-        margin: '2rem auto',
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-      }}>
-        <h2 style={{
-          fontSize: '2rem',
-          fontWeight: 700,
-          color: '#3730a3',
-          marginBottom: '1.2rem',
-          textAlign: 'center'
-        }}>
-           Добро пожаловать в ChillRate!
-        </h2>
-        <p style={{
-          color: '#4b5563',
-          lineHeight: 1.7,
-          fontSize: '1.1rem',
-          marginBottom: '1.8rem',
-          textAlign: 'center'
-        }}>
-          Этот проект создан для того, чтобы помочь командам быстро обмениваться полезной информацией, использовать QR-коды для подключения к сервисам и упростить внутренние процессы. Всё просто, понятно и удобно.
-        </p>
-        
-        <h3 style={{
-          fontSize: '1.4rem',
-          fontWeight: 600,
-          color: '#4338ca',
-          marginBottom: '1rem'
-        }}>
-          Почему выбирают нас?
-        </h3>
-        <ul style={{
-          paddingLeft: '1.5rem',
-          color: '#374151',
-          lineHeight: 1.6,
-          fontSize: '1rem',
-          marginBottom: '2rem'
-        }}>
-          <li>✨ <strong>Удобство</strong> — мгновенный доступ через QR-коды</li>
-          <li>⚡ <strong>Скорость</strong> — никакой лишней загрузки и заморочек</li>
-          <li>🤝 <strong>Командная сила</strong> — объединяем людей для достижения целей</li>
-          <li>📊 <strong>Прозрачность</strong> — отслеживай прогресс и результаты легко</li>
-          <li>💡 <strong>Инновации</strong> — мы всегда на шаг впереди</li>
-        </ul>
-
-        <button style={{
-          backgroundColor: '#6366f1',
-          padding: '1rem 2rem',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '14px',
-          fontWeight: 600,
-          fontSize: '1rem',
-          cursor: 'pointer',
-          display: 'block',
-          margin: '0 auto',
-          boxShadow: '0 5px 15px rgba(99, 102, 241, 0.3)',
-          transition: 'background-color 0.25s ease'
-        }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#6366f1'}
-        >
-          Узнать больше
-        </button>
-      </section>
+      
       <footer style={{
           backgroundColor: '#f1f5f9',
           padding: '2rem',

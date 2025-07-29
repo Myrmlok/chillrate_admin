@@ -31,7 +31,7 @@ const UserDetailPage = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'linear-gradient(135deg, #f9fafb 0%, #eef2ff 100%)',
+        background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
         padding: '2rem',
         textAlign: 'center'
       }}>
@@ -41,7 +41,7 @@ const UserDetailPage = () => {
           color: '#1e293b',
           fontWeight: 600
         }}>Пользователь не найден</h2>
-        <Link to="/" style={{
+        <Link to="/main" style={{
           display: 'inline-block',
           padding: '0.75rem 1.5rem',
           background: '#f1f5f9',
@@ -60,7 +60,7 @@ const UserDetailPage = () => {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: 'linear-gradient(to right, #3b83f618, #8a5cf61c)',
+      background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
       fontFamily: 'Arial, sans-serif'
     }}>
       {/* Header */}
@@ -94,7 +94,7 @@ const UserDetailPage = () => {
             margin: 0,
             lineHeight: '1.2'
           }}>
-            <Link to={'/'} style={{ textDecoration: 'none' }}>ChillRate</Link>
+            <Link to={'/main'} style={{ textDecoration: 'none' }}>ChillRate</Link>
           </h1>
         </div>
 

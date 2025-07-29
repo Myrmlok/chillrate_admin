@@ -12,7 +12,7 @@ const AuthPage = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#f8fafc',
+      background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
       fontFamily: "'Inter', sans-serif"
     }}>
       <div style={{
