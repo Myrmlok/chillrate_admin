@@ -171,13 +171,41 @@ const CoachDashboard = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [avgRelax, setAvgRelax] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [sortBy, setSortBy] = useState('updated'); //  'relax'
+  const requests = [
+    { id: '10', name: 'Алина', relax: 60, updated: '17.04.2025, 10:45' },
+    { id: '11', name: 'Кирилл', relax: 30, updated: '17.04.2025, 10:50' },
+  ]
+  const [joinRequests, setJoinRequests] = useState(requests);
+  const [showRequests, setShowRequests] = useState(false);
+
+  const handleAccept = (req) => {
+    setJoinRequests((prev) => prev.filter(r => r.id !== req.id));
+  };
+
+  const handleReject = (req) => {
+    setJoinRequests((prev) => prev.filter(r => r.id !== req.id));
+  };
+
 
   useEffect(() => {
-    const filtered = users.filter(u =>
+    let filtered = users.filter(u =>
       u.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    filtered.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+    if (sortBy === 'relaxMax') {
+      filtered = filtered.sort((a, b) => b.relax - a.relax);
+    } else if (sortBy === 'updatedMax') {
+      filtered = filtered.sort((a, b) =>
+        new Date(b.updated) - new Date(a.updated)
+      );
+    } else if (sortBy === 'relaxMin') {
+      filtered = filtered.sort((a, b) => a.relax - b.relax);
+    } else if (sortBy === 'updatedMin') {
+      filtered = filtered.sort((a, b) =>
+        new Date(a.updated) - new Date(b.updated)
+      );
+    }
 
     const sum = filtered.reduce((acc, user) => acc + user.relax, 0);
     const average = filtered.length ? (sum / filtered.length).toFixed(0) : 0;
@@ -185,7 +213,7 @@ const CoachDashboard = () => {
     setFilteredUsers(filtered);
     setAvgRelax(average);
     setTotalUsers(filtered.length);
-  }, [searchQuery]);
+  }, [searchQuery, sortBy]);
 
   return (
     <div style={{
@@ -208,7 +236,7 @@ const CoachDashboard = () => {
               padding: '0.5rem 1rem',
               border: '1px solid #d1d5db',
               borderRadius: '8px',
-              backgroundColor: 'white',
+              backgroundColor: '#fffffff',
               fontSize: '1rem'
             }}
           />
@@ -227,6 +255,17 @@ const CoachDashboard = () => {
           }}
         >
           Обновить
+        </button>
+        <button
+          style={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #cbd5e1',
+            borderRadius: '8px',
+            padding: '0.5rem 1rem',
+            cursor: 'pointer'
+          }}
+        >
+          ⚙️ Настройки команды
         </button>
       </div>
 
@@ -249,6 +288,25 @@ const CoachDashboard = () => {
         </div>
         <div>Участников: <span style={{ color: '#3b82f6', fontWeight: '700' }}>{totalUsers}</span></div>
       </div>
+      
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        style={{
+          padding: '0.5rem',
+          borderRadius: '8px',
+          border: '1px solid #d1d5db',
+          backgroundColor: 'white',
+          fontSize: '1rem',
+          marginBottom: '10px'
+        }}
+      >
+        <option value="updatedMax">Сортировка: По дате (убывание) </option>
+        <option value="updatedMin">Сортировка: По дате (возрастание) </option>
+        <option value="relaxMax">Сортировка: По расслабленности (убывание)</option>
+        <option value="relaxMin">Сортировка: По расслабленности (возрастание)</option>
+      </select>
+
 
       <UserTable users={filteredUsers} />
 
@@ -261,6 +319,130 @@ const CoachDashboard = () => {
           <UserCard key={index} user={user} />
         ))}
       </div>
+      <button
+        onClick={() => setShowRequests(!showRequests)}
+        style={{
+          marginBottom: '1rem',
+          padding: '0.5rem 1rem',
+          backgroundColor: '#3b82f6',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontWeight: 700
+        }}
+      >
+        {showRequests ? 'Скрыть заявки' : 'Показать заявки'}
+      </button>
+
+      {showRequests && joinRequests.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ 
+            marginBottom: '1.5rem',
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: '#1f2937',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" fill="#3b82f6"/>
+              <path d="M12 14C7.58172 14 4 15.7909 4 18V20H20V18C20 15.7909 16.4183 14 12 14Z" fill="#3b82f6"/>
+            </svg>
+            Заявки на вступление
+          </h2>
+
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1.25rem',
+            borderRadius: '12px',
+            overflow: 'hidden'
+          }}>
+            {joinRequests.map((req) => (
+              <div key={req.id} style={{
+                backgroundColor: 'white',
+                padding: '1.25rem 1.5rem',
+                border: 'thick double #32a2ce46',
+                borderRadius: '12px',
+                boxShadow: '0 0px 15px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                ':hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+                }
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column',  }}>
+                  <strong style={{ 
+                    fontSize: '1.1rem',
+                    color: '#111827',
+                    marginBottom: '0.25rem'
+                  }}>{req.name}</strong>
+                  <span style={{ 
+                    fontSize: '0.9rem',
+                    color: '#6b7280'
+                  }}>{req.updated}</span>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button onClick={() => handleAccept(req)} style={{
+                    background: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.6rem 1.2rem',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    fontSize: '0.95rem',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    ':hover': {
+                      background: '#059669',
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                    }
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Принять
+                  </button>
+
+                  <button onClick={() => handleReject(req)} style={{
+                    background: 'transparent',
+                    color: '#ef4444',
+                    border: '1px solid #ef4444',
+                    borderRadius: '8px',
+                    padding: '0.6rem 1.2rem',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    fontSize: '0.95rem',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    ':hover': {
+                      background: '#fee2e2',
+                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.2)'
+                    }
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Отклонить
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -316,7 +498,8 @@ const DashboardLayout = () => (
     </header>
     <main style={{ 
       padding: '2rem',
-      flex: 1
+      flex: 1,
+      background: 'linear-gradient(to right, #3b83f618, #8a5cf61c)',
     }}>
       <CoachDashboard />
     </main>

@@ -13,8 +13,8 @@ const CoachHomePage = () => {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: '#f8fafc',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif"
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif",
+      background: 'linear-gradient(to right, #3b83f618, #8a5cf61c)',
     }}>
       {/* Верхняя панель */}
       <header style={{
