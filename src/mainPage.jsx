@@ -1,12 +1,88 @@
 // CoachHomePage.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import Api from './Api.js';
+
+Api.init();
 
 const CoachHomePage = () => {
-  const teams = ['Команда A', 'Команда Б'];
+  const [teams, setTeams] = useState([]);
   const totalUsers = 4;
   const avgRelax = 59;
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTeamName, setNewTeamName] = useState('');
+  const [loadingTeams, setLoadingTeams] = useState(false);
+  const [error, setError] = useState(null);
+  const [requests, setRequests] = React.useState([
+    {
+      id: 'u1',
+      name: 'Сергей Петров',
+      scannedAt: '2025-07-30T12:34:00Z',
+      assigned: [],
+    },
+    {
+      id: 'u2',
+      name: 'Мария Лебедева',
+      scannedAt: '2025-07-30T13:10:00Z',
+      assigned: [],
+    },
+  ]);
+
+  const handleAddTeam = async () => {
+    const trimmedName = newTeamName.trim();
+    if (!trimmedName) {
+      setError('Название команды не может быть пустым');
+      return;
+    }
+
+    if (teams.includes(trimmedName)) {
+      setError('Команда с таким названием уже существует');
+      return;
+    }
+
+    setError(null);
+    setIsAdding(false);
+
+    try {
+      const response = await Api.createTeam(trimmedName);
+
+      const createdTeam = response?.team || response?.data || trimmedName;
+
+      setTeams(prev => [...prev, createdTeam]);
+      setNewTeamName('');
+
+    } catch (error) {
+      setError(error.response?.data?.message || 
+               error.message || 
+               'Неизвестная ошибка при создании команды');
+      setIsAdding(true);
+    }
+};
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      setLoadingTeams(true);
+      setError(null);
+      try {
+        const result = await Api.getTeams();
+        if (result?.error) {
+          setError(typeof result.error === 'string' ? result.error : JSON.stringify(result.error));
+        } else if (Array.isArray(result)) {
+          setTeams(result);
+        } else if (result?.teams) {
+          setTeams(result.teams);
+        } else {
+          setTeams([]);
+        }
+      } catch (ex) {
+        setError(ex.message || 'Ошибка при загрузке команд');
+      } finally {
+        setLoadingTeams(false);
+      }
+    };
+    fetchTeams();
+  }, []);
 
   return (
     <div style={{
@@ -148,8 +224,39 @@ const CoachHomePage = () => {
               </li>
             ))}
             <li>
+            {isAdding ? (
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+              <input
+                type="text"
+                placeholder="Название команды"
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                style={{
+                  flexGrow: 1,
+                  padding: '0.9rem 1rem',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '0.75rem'
+                }}
+              />
+              <button
+                onClick={handleAddTeam}
+                style={{
+                  padding: '0.9rem 1.25rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  fontWeight: 500,
+                  borderRadius: '12px',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Создать
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={() => console.log("Добавить команду")}
+              onClick={() => setIsAdding(true)}
               style={{
                 width: '100%',
                 padding: '0.9rem 1.25rem',
@@ -166,6 +273,7 @@ const CoachHomePage = () => {
             >
               ➕ Добавить команду
             </button>
+          )}
           </li>
           </ul>
         </section>
@@ -340,7 +448,158 @@ const CoachHomePage = () => {
             Поделиться QR-кодом
           </button>
         </section>
+        
+        {/* Новая секция: заявки */}
+      <section
+        style={{
+          backgroundColor: '#fafafa',
+          padding: '2rem',
+          borderRadius: '16px',
+          boxShadow: '0 10px 30px rgba(99, 102, 241, 0.1)',
+          border: '1px solid #e0e7ff',
+          maxWidth: '1000px',
+          margin: '2rem auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+        }}
+      >
+        <h2
+          style={{
+            marginBottom: '1.5rem',
+            fontWeight: 600,
+            fontSize: '1.5rem',
+            color: '#1e293b',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              width: '6px',
+              height: '24px',
+              backgroundColor: '#10b981',
+              borderRadius: '3px',
+            }}
+          ></span>
+          Заявки на добавление
+        </h2>
 
+        {(() => {
+          return requests.map((user) => (
+            <div
+              key={user.id}
+              style={{
+                backgroundColor: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                    Отсканировал QR: {new Date(user.scannedAt).toLocaleString('ru-RU')}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div
+                    style={{
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '8px',
+                      border: '1px solid #3b82f6',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      cursor: user.assigned.length === 0 ? 'not-allowed' : 'pointer',
+                      backgroundColor: '#eef6ff',
+                      opacity: user.assigned.length === 0 ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    onClick={() => {
+                      if (user.assigned.length === 0) return;
+                      alert(`Добавить ${user.name} в: ${user.assigned.join(', ')}`);
+                      setRequests((prev) => prev.filter((u) => u.id !== user.id));
+                    }}
+                  >
+                    Добавить
+                  </div>
+                  <div
+                    style={{
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '8px',
+                      border: '1px solid #f87171',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      backgroundColor: '#fff0f0',
+                      color: '#b91c1c',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    onClick={() => {
+                      alert(`Отклонить ${user.name}`);
+                      setRequests((prev) => prev.filter((u) => u.id !== user.id));
+                    }}
+                  >
+                    Отклонить
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>Выбрать команды:</div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  {teams.map((t) => (
+                    <label
+                      key={t + user.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.85rem',
+                        backgroundColor: '#f0f4f8',
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d9ee',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={user.assigned.includes(t)}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setRequests((prev) =>
+                            prev.map((u) => {
+                              if (u.id !== user.id) return u;
+                              const assigned = checked
+                                ? [...u.assigned, t]
+                                : u.assigned.filter((x) => x !== t);
+                              return { ...u, assigned };
+                            })
+                          );
+                        }}
+                        style={{ margin: 0 }}
+                      />
+                      {t}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ));
+        })()}
+      </section>
         
       </main>
 
