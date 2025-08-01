@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import logo from './assets/logo.svg';
 import Api from './Api'; 
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,6 +36,11 @@ const AuthPage = () => {
         localStorage.setItem('jwt', result.token);
         Api.setToken(result.token)
         setMsg('Успешно!');
+        if (isLogin) {
+          navigate('/main');
+        } else {
+          navigate('/confirm');
+        }
       } else {
         setMsg('нет токена. ' + JSON.stringify(result));
       }
@@ -61,7 +67,8 @@ const AuthPage = () => {
         boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
         width: '100%',
         maxWidth: '400px',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: "'Inter', sans-serif"
       }}>
         <div style={{ color: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', textAlign: 'center' }}>
           <img src={logo} style={{ width: '400px', height: '200px' }} alt="logo" />

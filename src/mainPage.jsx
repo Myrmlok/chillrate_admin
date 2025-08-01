@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import Api from './Api.js';
 
-Api.init();
 
 const CoachHomePage = () => {
   const [teams, setTeams] = useState([]);
@@ -14,20 +13,7 @@ const CoachHomePage = () => {
   const [newTeamName, setNewTeamName] = useState('');
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [error, setError] = useState(null);
-  const [requests, setRequests] = React.useState([
-    {
-      id: 'u1',
-      name: 'Сергей Петров',
-      scannedAt: '2025-07-30T12:34:00Z',
-      assigned: [],
-    },
-    {
-      id: 'u2',
-      name: 'Мария Лебедева',
-      scannedAt: '2025-07-30T13:10:00Z',
-      assigned: [],
-    },
-  ]);
+  const [requests, setRequests] = useState([]);
 
   const handleAddTeam = async () => {
     const trimmedName = newTeamName.trim();
@@ -61,27 +47,46 @@ const CoachHomePage = () => {
 };
 
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchData = async () => {
       setLoadingTeams(true);
       setError(null);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Не авторизован');
+        setLoadingTeams(false);
+        return;
+      }
+
       try {
-        const result = await Api.getTeams();
-        if (result?.error) {
-          setError(typeof result.error === 'string' ? result.error : JSON.stringify(result.error));
-        } else if (Array.isArray(result)) {
-          setTeams(result);
-        } else if (result?.teams) {
-          setTeams(result.teams);
+        const [teamsRes, waitUsersRes] = await Promise.all([
+          Api.getTeams(token),
+          Api.getWaitUsers(token),
+        ]);
+
+        if (teamsRes?.error) {
+          setError((prev) => prev ? prev + '; ' + teamsRes.error : teamsRes.error);
+        } else if (Array.isArray(teamsRes)) {
+          setTeams(teamsRes);
+        } else if (teamsRes?.teams) {
+          setTeams(teamsRes.teams);
         } else {
-          setTeams([]);
+          console.warn('Непредвиденный формат ответа getTeams:', teamsRes);
+        }
+
+        if (waitUsersRes?.error) {
+          setError((prev) => prev ? prev + '; ' + waitUsersRes.error : waitUsersRes.error);
+        } else {
+          setRequests(Array.isArray(waitUsersRes) ? waitUsersRes : waitUsersRes.users || []);
         }
       } catch (ex) {
-        setError(ex.message || 'Ошибка при загрузке команд');
+        setError(ex.message || 'Ошибка при загрузке данных');
       } finally {
         setLoadingTeams(false);
       }
     };
-    fetchTeams();
+
+    fetchData();
   }, []);
 
   return (
@@ -89,7 +94,7 @@ const CoachHomePage = () => {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif",
+      fontFamily: "'Inter', sans-serif",
       background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
     }}>
       {/* Верхняя панель */}
@@ -171,6 +176,7 @@ const CoachHomePage = () => {
         gap: '2rem',
         boxSizing: 'border-box'
       }}>
+        {error && <><span>{error}</span></>}
         <section style={{
           backgroundColor: 'white',
           padding: '1.75rem',

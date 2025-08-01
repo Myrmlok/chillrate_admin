@@ -5,6 +5,7 @@ import DashboardLayout from './teamPage';
 import UserDetailPage from './UserDetailPage';
 import AuthPage from './auth';
 import WelcomePage from './welcomePage';
+import ConfirmEmailPage from './confirmEmailPage';
 
 
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/team/:name" element={< DashboardLayout/>} />
         <Route path="/user/:userId" element={<UserDetailPage />} />
         <Route path="/" element={<WelcomePage />} />
+        <Route path="/confirm" element={<ConfirmEmailPage />} />
       </Routes>
     </Router>
   );

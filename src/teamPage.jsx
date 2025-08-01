@@ -21,7 +21,8 @@ const UserCard = ({ user }) => (
     borderRadius: '12px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     transition: 'transform 0.3s, box-shadow 0.3s',
-    marginBottom: '1rem'
+    marginBottom: '1rem',
+    fontFamily: "'Inter', sans-serif",
   }}>
     <div style={{
       display: 'flex',

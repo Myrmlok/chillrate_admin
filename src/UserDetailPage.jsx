@@ -33,7 +33,8 @@ const UserDetailPage = () => {
         alignItems: 'center',
         background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
         padding: '2rem',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: "'Inter', sans-serif",
       }}>
         <h2 style={{
           fontSize: '1.75rem',

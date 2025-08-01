@@ -2,20 +2,6 @@ import axios from "axios";
 
 class Api{
     static url=`http://26.229.77.233:8099/api/v1`;
-    static token = null;  
-
-    static setToken(jwt) {
-      this.token = jwt;
-    }
-
-    static init() {
-      axios.interceptors.request.use((config) => {
-        if (this.token) {
-          config.headers['Authorization'] = `Bearer ${this.token}`;
-        }
-        return config;
-      });
-    }
 
     static async register(name,email,password){
         return await axios.post(`${this.url}/auth/regAdmin`,{
@@ -41,8 +27,8 @@ class Api{
     }
 
     // распределение
-    static async getClientDist(uuid) {
-      await axios.get(`${this.url}/client/${uuid}`)
+    static async getClientDist(uuid, token) {
+      return await axios.get(`${this.url}/client/${uuid}`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -51,8 +37,8 @@ class Api{
         });
     }
 
-    static async getTeams() {
-      await axios.get(`${this.url}/team`)
+    static async getTeams(token) {
+      return await axios.get(`${this.url}/team`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -61,8 +47,8 @@ class Api{
         });
     }
 
-    static async acceptUser(teamId, userId) {
-      await axios.get(`${this.url}/team/${teamId}/${userId}`)
+    static async acceptUser(teamId, userId, token) {
+      return await axios.get(`${this.url}/team/${teamId}/${userId}`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -71,8 +57,8 @@ class Api{
         });
     }
 
-    static async removeUser(teamId, userId) {
-      await axios.delete(`${this.url}/team/${teamId}/${userId}`)
+    static async removeUser(teamId, userId, token) {
+      return await axios.delete(`${this.url}/team/${teamId}/${userId}`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -81,8 +67,8 @@ class Api{
         });
     }
 
-    static async createTeam(name) {
-      await axios.post(`${this.url}/team`, { name: name })
+    static async createTeam(name, token) {
+      return await axios.post(`${this.url}/team`, { name: name }, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -91,8 +77,8 @@ class Api{
         });
     }
 
-    static async editTeamName(name) {
-      await axios.put(`${this.url}/team`, { name: name })
+    static async editTeamName(name, token) {
+      return await axios.put(`${this.url}/team`, { name: name }, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -101,8 +87,8 @@ class Api{
         });
     }
 
-    static async deleteTeam(id) {
-      await axios.delete(`${this.url}/team/${id}`)
+    static async deleteTeam(id, token) {
+      return await axios.delete(`${this.url}/team/${id}`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -111,8 +97,8 @@ class Api{
         });
     }
 
-    static async getTeamInfo(id) {
-      await axios.get(`${this.url}/team/${id}`)
+    static async getTeamInfo(id, token) {
+      return await axios.get(`${this.url}/team/${id}`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -121,8 +107,8 @@ class Api{
         });
     }
 
-    static async getAdminUrl() {
-      await axios.get(`${this.url}/admin/url`)
+    static async getAdminUrl(token) {
+      return await axios.get(`${this.url}/admin/url`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -131,8 +117,8 @@ class Api{
         });
     }
 
-    static async getWaitUsers() {
-      await axios.get(`${this.url}/admin/waitUsers`)
+    static async getWaitUsers(token) {
+      return await axios.get(`${this.url}/admin/waitUsers`, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
