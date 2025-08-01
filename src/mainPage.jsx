@@ -7,13 +7,36 @@ import Api from './Api.js';
 
 const CoachHomePage = () => {
   const [teams, setTeams] = useState([]);
-  const totalUsers = 4;
+  const totalUsers = teams.reduce((sum, team) => sum + team.clients.length, 0)
   const avgRelax = 59;
+  const token = localStorage.getItem('token');
   const [isAdding, setIsAdding] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [error, setError] = useState(null);
   const [requests, setRequests] = useState([]);
+
+  // Состояние для хранения выбранных команд для каждого пользователя
+  const [selectedTeams, setSelectedTeams] = useState(
+    requests.reduce((acc, request) => {
+      acc[request.email] = [];
+      return acc;
+    }, {})
+  );
+
+  const handleAddToTeam = async (userEmail, teamId) => {
+    try {
+      const response = await Api.acceptUser(teamId, userEmail, token);
+      
+      if (response.data) {
+        setRequests(prev => prev.filter(request => request.id !== userEmail));
+      } else {
+        console.error('Ошибка при добавлении пользователя в команду');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleAddTeam = async () => {
     const trimmedName = newTeamName.trim();
@@ -22,20 +45,12 @@ const CoachHomePage = () => {
       return;
     }
 
-    if (teams.includes(trimmedName)) {
-      setError('Команда с таким названием уже существует');
-      return;
-    }
-
     setError(null);
     setIsAdding(false);
 
     try {
-      const response = await Api.createTeam(trimmedName);
+      const response = await Api.createTeam(trimmedName, token);
 
-      const createdTeam = response?.team || response?.data || trimmedName;
-
-      setTeams(prev => [...prev, createdTeam]);
       setNewTeamName('');
 
     } catch (error) {
@@ -50,8 +65,6 @@ const CoachHomePage = () => {
     const fetchData = async () => {
       setLoadingTeams(true);
       setError(null);
-
-      const token = localStorage.getItem('token');
       if (!token) {
         setError('Не авторизован');
         setLoadingTeams(false);
@@ -68,8 +81,6 @@ const CoachHomePage = () => {
           setError((prev) => prev ? prev + '; ' + teamsRes.error : teamsRes.error);
         } else if (Array.isArray(teamsRes)) {
           setTeams(teamsRes);
-        } else if (teamsRes?.teams) {
-          setTeams(teamsRes.teams);
         } else {
           console.warn('Непредвиденный формат ответа getTeams:', teamsRes);
         }
@@ -77,7 +88,7 @@ const CoachHomePage = () => {
         if (waitUsersRes?.error) {
           setError((prev) => prev ? prev + '; ' + waitUsersRes.error : waitUsersRes.error);
         } else {
-          setRequests(Array.isArray(waitUsersRes) ? waitUsersRes : waitUsersRes.users || []);
+          setRequests(waitUsersRes);
         }
       } catch (ex) {
         setError(ex.message || 'Ошибка при загрузке данных');
@@ -87,7 +98,7 @@ const CoachHomePage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [token, teams, requests]);
 
   return (
     <div style={{
@@ -208,9 +219,9 @@ const CoachHomePage = () => {
             Мои команды
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {teams.map((team, index) => (
-              <li key={index} style={{ marginBottom: '0.75rem' }}>
-                <Link to={`/team/a`} style={{
+            {teams.map((team) => (
+              <li key={team.id} style={{ marginBottom: '0.75rem' }}>
+                <Link to={`/team/${team.id}`} style={{
                   display: 'block',
                   padding: '0.9rem 1.25rem',
                   backgroundColor: '#f8fafc',
@@ -225,7 +236,7 @@ const CoachHomePage = () => {
                     transform: 'translateX(4px)'
                   }
                 }}>
-                  {team}
+                  {team.name}
                 </Link>
               </li>
             ))}
@@ -456,22 +467,15 @@ const CoachHomePage = () => {
         </section>
         
         {/* Новая секция: заявки */}
-      <section
-        style={{
-          backgroundColor: '#fafafa',
-          padding: '2rem',
+      <section style={{
+          backgroundColor: 'white',
+          padding: '1.75rem',
           borderRadius: '16px',
-          boxShadow: '0 10px 30px rgba(99, 102, 241, 0.1)',
-          border: '1px solid #e0e7ff',
-          maxWidth: '1000px',
-          margin: '2rem auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-        }}
-      >
-        <h2
-          style={{
+          boxShadow: '0 8px 24px rgba(149, 157, 165, 0.15)',
+          border: '1px solid #f0f2f5',
+          gridColumn: '1 / -1'
+        }}>
+          <h2 style={{
             marginBottom: '1.5rem',
             fontWeight: 600,
             fontSize: '1.5rem',
@@ -479,133 +483,99 @@ const CoachHomePage = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
-          }}
-        >
-          <span
-            style={{
+          }}>
+            <span style={{
               display: 'inline-block',
               width: '6px',
               height: '24px',
-              backgroundColor: '#10b981',
-              borderRadius: '3px',
-            }}
-          ></span>
-          Заявки на добавление
-        </h2>
+              backgroundColor: '#f59e0b',
+              borderRadius: '3px'
+            }}></span>
+            Заявки на вступление
+          </h2>
 
-        {(() => {
-          return requests.map((user) => (
-            <div
-              key={user.id}
-              style={{
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '12px',
-                padding: '1rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                    Отсканировал QR: {new Date(user.scannedAt).toLocaleString('ru-RU')}
+          {requests.length === 0 ? (
+            <div style={{
+              padding: '2rem',
+              textAlign: 'center',
+              color: '#64748b',
+              backgroundColor: '#f8fafc',
+              borderRadius: '12px'
+            }}>
+              Нет новых заявок на вступление
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              {requests.map(request => (
+                <div key={request.email} style={{
+                  padding: '1.25rem',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '1rem'
+                  }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#1e293b' }}>{request.name}</div>
+                      <div style={{ color: '#64748b', fontSize: '0.9rem' }}>{request.email}</div>
+                    </div>
                   </div>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <div
-                    style={{
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '8px',
-                      border: '1px solid #3b82f6',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      cursor: user.assigned.length === 0 ? 'not-allowed' : 'pointer',
-                      backgroundColor: '#eef6ff',
-                      opacity: user.assigned.length === 0 ? 0.6 : 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                    onClick={() => {
-                      if (user.assigned.length === 0) return;
-                      alert(`Добавить ${user.name} в: ${user.assigned.join(', ')}`);
-                      setRequests((prev) => prev.filter((u) => u.id !== user.id));
-                    }}
-                  >
-                    Добавить
-                  </div>
-                  <div
-                    style={{
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '8px',
-                      border: '1px solid #f87171',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                      backgroundColor: '#fff0f0',
-                      color: '#b91c1c',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                    onClick={() => {
-                      alert(`Отклонить ${user.name}`);
-                      setRequests((prev) => prev.filter((u) => u.id !== user.id));
-                    }}
-                  >
-                    Отклонить
-                  </div>
-                </div>
-              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>Выбрать команды:</div>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  {teams.map((t) => (
-                    <label
-                      key={t + user.id}
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '1rem',
+                    flexWrap: 'wrap'
+                  }}>
+                    {teams.map(team => (
+                      <button
+                        key={team.id}
+                        onClick={() => handleAddToTeam(request.email, team.id)}
+                        style={{
+                          padding: '0.6rem 1rem',
+                          backgroundColor: '#e0f2fe',
+                          color: '#0369a1',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          ':hover': {
+                            backgroundColor: '#bae6fd'
+                          }
+                        }}
+                      >
+                        Добавить в {team.name}
+                      </button>
+                    ))}
+                    
+                    <button
+                      onClick={() => handleRejectRequest(request.id)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.85rem',
-                        backgroundColor: '#f0f4f8',
-                        padding: '6px 10px',
+                        padding: '0.6rem 1rem',
+                        backgroundColor: '#fee2e2',
+                        color: '#b91c1c',
+                        border: 'none',
                         borderRadius: '8px',
-                        border: '1px solid #d1d9ee',
+                        fontWeight: 500,
                         cursor: 'pointer',
-                        userSelect: 'none',
+                        transition: 'all 0.2s ease',
+                        ':hover': {
+                          backgroundColor: '#fecaca'
+                        }
                       }}
                     >
-                      <input
-                        type="checkbox"
-                        checked={user.assigned.includes(t)}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setRequests((prev) =>
-                            prev.map((u) => {
-                              if (u.id !== user.id) return u;
-                              const assigned = checked
-                                ? [...u.assigned, t]
-                                : u.assigned.filter((x) => x !== t);
-                              return { ...u, assigned };
-                            })
-                          );
-                        }}
-                        style={{ margin: 0 }}
-                      />
-                      {t}
-                    </label>
-                  ))}
+                      Отклонить
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ));
-        })()}
-      </section>
+          )}
+        </section>
         
       </main>
 

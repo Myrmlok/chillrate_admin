@@ -47,8 +47,8 @@ class Api{
         });
     }
 
-    static async acceptUser(teamId, userId, token) {
-      return await axios.get(`${this.url}/team/${teamId}/${userId}`, {headers: {Authorization: `Client ${token}`}})
+    static async acceptUser(teamId, userEmail, token) {
+      return await axios.post(`${this.url}/team/${teamId}/${userEmail}`, {}, {headers: {Authorization: `Client ${token}`}})
         .then((response) => {
           return response.data;
         })
@@ -127,5 +127,14 @@ class Api{
         });
     }
 
+    static async getUserData(teamId, userEmail, token) {
+      return await axios.get(`${this.url}/admin/${teamId}/${userEmail}`, {headers: {Authorization: `Client ${token}`}})
+        .then((response) => {
+          return response.data;
+        })
+        .catch((ex) => {
+          return ex;
+        });
+    }
 }
 export default Api;

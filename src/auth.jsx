@@ -10,7 +10,7 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [working, setWorking] = useState(false);
   const [msg, setMsg] = useState(null);
-
+  const navigate = useNavigate();
   const toggleAuth = () => {
     setIsLogin(!isLogin);
     setMsg(null);
@@ -33,8 +33,8 @@ const AuthPage = () => {
       if (result?.error) {
         setMsg(`Ошибка: ${typeof result.error === 'string' ? result.error : JSON.stringify(result.error)}`);
       } else if (result?.token) {
-        localStorage.setItem('jwt', result.token);
-        Api.setToken(result.token)
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', result.user);
         setMsg('Успешно!');
         if (isLogin) {
           navigate('/main');

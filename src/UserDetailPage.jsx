@@ -1,27 +1,90 @@
 import { useParams, Link } from 'react-router-dom';
+import  { useState, useEffect} from  'react';
+import Api from './Api';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area
 } from 'recharts';
 
 const users = [
-  { id: '1', name: 'Стасян', relax: 75, updated: '17.04.2025, 10:23', team: 'Команда A' },
-  { id: '2', name: 'Димас', relax: 50, updated: '17.04.2025, 10:19', team: 'Команда A' },
-  { id: '3', name: 'Артем', relax: 20, updated: '17.04.2025, 10:19', team: 'Команда Б' },
-  { id: '4', name: 'Пашок', relax: 90, updated: '17.04.2025, 10:19', team: 'Команда Б' }
+  { email: '1', name: 'Стасян', relax: 75, updated: '17.04.2025, 10:23', team: 'Команда A' },
+  { email: '2', name: 'Димас', relax: 50, updated: '17.04.2025, 10:19', team: 'Команда A' },
+  { email: '3', name: 'Артем', relax: 20, updated: '17.04.2025, 10:19', team: 'Команда Б' },
+  { email: '4', name: 'Пашок', relax: 90, updated: '17.04.2025, 10:19', team: 'Команда Б' },
+  { email: 'komarovdima753@mail.ru', name: 'Дима', team: 'DimaTeam'},
 ];
 
-const sampleData = [
-  { time: '10:00', relax: 70 },
-  { time: '10:05', relax: 72 },
-  { time: '10:10', relax: 68 },
-  { time: '10:15', relax: 75 },
-  { time: '10:20', relax: 73 },
-  { time: '10:25', relax: 78 }
-];
+
 
 const UserDetailPage = () => {
-  const { userId } = useParams();
-  const user = users.find(u => u.id === userId);
+  const { teamId, email } = useParams();
+  const user = users.find(u => u.email === email);
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentAnxiety, setCurrentAnxiety] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const token = localStorage.getItem('token');
+        
+        const response = await Api.getUserData(52, email, token);
+        
+        if (!response || !Array.isArray(response)) {
+          throw new Error('Некорректный формат данных');
+        }
+
+        const formattedData = response.map(item => {
+          try {
+            const anxietyData = JSON.parse(item.data);
+            const date = new Date(item.dateTime);
+            return {
+              time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              date: date.toLocaleDateString(),
+              anxiety: anxietyData.percentageAnxiety,
+              fullDate: date
+            };
+          } catch (e) {
+            console.error('Ошибка парсинга данных:', e);
+            return null;
+          }
+        }).filter(item => item !== null)
+          .sort((a, b) => a.fullDate - b.fullDate);
+
+        if (formattedData.length > 0) {
+          setCurrentAnxiety(formattedData[formattedData.length - 1].anxiety);
+          setLastUpdate(formattedData[formattedData.length - 1].fullDate);
+        }
+
+        setChartData(formattedData);
+      } catch (err) {
+        console.error('Ошибка при загрузке данных:', err);
+        setError(err.message || 'Ошибка загрузки данных');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [email]);
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '300px',
+        color: '#64748b'
+      }}>
+        Загрузка данных...
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -161,48 +224,12 @@ const UserDetailPage = () => {
               marginTop: '1rem',
               flexWrap: 'wrap'
             }}>
-              <div style={{
-                background: 'white',
-                padding: '1rem 1.5rem',
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                minWidth: '180px'
-              }}>
-                <div style={{
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  marginBottom: '0.5rem'
-                }}>Текущий уровень</div>
-                <div style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: '#3b82f6'
-                }}>{user.relax}%</div>
-              </div>
               
-              <div style={{
-                background: 'white',
-                padding: '1rem 1.5rem',
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                minWidth: '180px'
-              }}>
-                <div style={{
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  marginBottom: '0.5rem'
-                }}>Последнее обновление</div>
-                <div style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: '#1e293b'
-                }}>{user.updated}</div>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Chart Section */}
+        {/* Chart Section
         <div style={{
           background: 'white',
           borderRadius: '12px',
@@ -275,12 +302,117 @@ const UserDetailPage = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </div> */}
+
+        <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+
+      
+      <div style={{ 
+        display: 'flex', 
+        gap: '20px', 
+        marginBottom: '20px',
+        flexWrap: 'wrap' 
+      }}>
+        <div style={{
+          background: '#fff',
+          padding: '15px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+          minWidth: '200px'
+        }}>
+          <div style={{ color: '#64748b', fontSize: '0.9rem' }}>Текущий уровень</div>
+          <div style={{ 
+            fontSize: '1.8rem', 
+            fontWeight: 'bold',
+            color: currentAnxiety > 70 ? '#10b981' : currentAnxiety > 40 ? '#f59e0b' : '#ef4444'
+          }}>
+            {currentAnxiety !== null ? `${currentAnxiety}%` : 'Н/Д'}
+          </div>
         </div>
+        
+        <div style={{
+          background: '#fff',
+          padding: '15px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+          minWidth: '200px'
+        }}>
+          <div style={{ color: '#64748b', fontSize: '0.9rem' }}>Последнее обновление</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>
+            {lastUpdate ? lastUpdate.toLocaleString() : 'Н/Д'}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ 
+        background: '#fff',
+        borderRadius: '8px',
+        padding: '20px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+        height: '400px'
+      }}>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis 
+                dataKey="time" 
+                tick={{ fill: '#64748b' }}
+                label={{ 
+                  value: 'Время', 
+                  position: 'insideBottomRight', 
+                  offset: -10,
+                  fill: '#64748b'
+                }}
+              />
+              <YAxis 
+                domain={[0, 100]}
+                tick={{ fill: '#64748b' }}
+                label={{ 
+                  value: 'Расслабленность (%)', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  fill: '#64748b'
+                }}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: '#fff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                }}
+                formatter={(value) => [`${value}%`, 'Уровень расслабленности']}
+                labelFormatter={(label) => `Время: ${label}`}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="anxiety" 
+                stroke="#8b5cf6" 
+                strokeWidth={2}
+                dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            color: '#64748b'
+          }}>
+            Нет данных для отображения
+          </div>
+        )}
+      </div>
+    </div>
 
         {/* Back Button */}
         <div style={{ textAlign: 'center' }}>
           <Link 
-            to={`/team/${user.team.toLowerCase().replace(' ', '-')}`} 
+            to={`/`} 
             style={{
               display: 'inline-flex',
               alignItems: 'center',
