@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import  { useState, useEffect} from  'react';
+import  { useState, useEffect, useRef } from  'react';
 import Api from './Api';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area
@@ -32,7 +32,7 @@ const UserDetailPage = () => {
         
         const token = localStorage.getItem('token');
         
-        const response = await Api.getUserData(52, email, token);
+        const response = await Api.getUserData(teamId, email, token);
         
         if (!response || !Array.isArray(response)) {
           throw new Error('Некорректный формат данных');
@@ -70,6 +70,11 @@ const UserDetailPage = () => {
     };
 
     fetchUserData();
+
+    const intervalId = setInterval(fetchUserData, 5000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [email]);
 
   if (loading) {
@@ -412,7 +417,7 @@ const UserDetailPage = () => {
         {/* Back Button */}
         <div style={{ textAlign: 'center' }}>
           <Link 
-            to={`/`} 
+            to={`/team/${teamId}`} 
             style={{
               display: 'inline-flex',
               alignItems: 'center',

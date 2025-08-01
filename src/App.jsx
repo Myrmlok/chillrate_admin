@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/main" element={<CoachHomePage />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/team/:name" element={< DashboardLayout/>} />
+        <Route path="/team/:teamId" element={< DashboardLayout/>} />
         <Route path="/:teamId/:email" element={<UserDetailPage />} />
         <Route path="/" element={<WelcomePage />} />
         <Route path="/confirm" element={<ConfirmEmailPage />} />
