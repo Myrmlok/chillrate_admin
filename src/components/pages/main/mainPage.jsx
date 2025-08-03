@@ -18,7 +18,8 @@ const CoachHomePage = () => {
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [error, setError] = useState(null);
   const [requests, setRequests] = useState([]);
-
+  const [urlAdmin,setUrlAdmin]=useState(null);
+  const [copied,setCopied]=useState(false);
   // Состояние для хранения выбранных команд для каждого пользователя
   const [selectedTeams, setSelectedTeams] = useState(
     requests.reduce((acc, request) => {
@@ -26,7 +27,6 @@ const CoachHomePage = () => {
       return acc;
     }, {})
   );
-
   const handleAddToTeam = async (userEmail, teamId) => {
     try {
       const response = await Api.acceptUser(teamId, userEmail, token);
@@ -63,8 +63,13 @@ const CoachHomePage = () => {
       setIsAdding(true);
     }
 };
-
-  useEffect(() => {
+useEffect(()=>{
+  const load=async()=>{
+    setUrlAdmin(await Api.getAdminUrl(token));
+  }
+  load();
+})
+useEffect(() => {
     const fetchData = async () => {
       setLoadingTeams(true);
       setError(null);
@@ -398,8 +403,12 @@ const CoachHomePage = () => {
             ':hover': {
               backgroundColor: '#ddd6fe'
             }
+          }}
+          onClick={(e)=>{
+          navigator.clipboard.writeText(urlAdmin);
+          setCopied(true);
           }}>
-            Поделиться QR-кодом
+           {copied?"Скопировано":" Поделиться QR-кодом"}
           </button>
         </section>
         

@@ -27,7 +27,7 @@ const HeaderApp=()=>{
             ⚙ Настройки
           </button>
           <button
-            onClick={() => console.log("Выход")}
+            onClick={() => Security.logout()}
             className="buttonLogoutHeader"
           >
           Выйти

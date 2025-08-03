@@ -2,7 +2,11 @@ import axios from "axios";
 
 class Api{
     static url=`http://26.229.77.233:8099/api/v1`;
-
+    static async getTest(token){
+      return await axios.get(`${this.url}/test`,{headers: {Authorization: `Client ${token}`}})
+      .then(response=>response.data)
+      .catch(ex=>null);
+    }
     static async register(name,email,password){
         return await axios.post(`${this.url}/auth/regAdmin`,{
             name:name,

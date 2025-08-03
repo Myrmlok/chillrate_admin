@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import { json } from "stream/consumers";
+import Api from "./Api";
 
 class Security{
 
     private static tokenParamName='token';
     private static authParamName='user';
+    static callBack;
     static login(userData,token){
         localStorage.setItem(this.tokenParamName, token);
         localStorage.setItem(this.authParamName,JSON.stringify(userData));
@@ -18,9 +21,23 @@ class Security{
         }
         return userData;
     }
+    static async getAuthWithCheck(){
+        var token=this.getToken();
+        if(token==null){
+            this.callBack(null);
+            return;
+        }
+        if(await Api.getTest(token)){
+            this.callBack( this.getAuth());
+        }
+        else{
+            this.callBack(null);
+        }
+    }
     static logout(){
         localStorage.removeItem(this.tokenParamName);
         localStorage.removeItem(this.authParamName);
+        this.callBack(null);
     }
 }
 
