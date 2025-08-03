@@ -1,9 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
 import  { useState, useEffect, useRef } from  'react';
-import Api from './Api';
+import Api from '../../../service/Api';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area
 } from 'recharts';
+import HeaderApp from '../../header/HeaderApp';
 
 const users = [
   { email: '1', name: 'Стасян', relax: 75, updated: '17.04.2025, 10:23', team: 'Команда A' },
@@ -133,49 +134,7 @@ const UserDetailPage = () => {
       fontFamily: 'Arial, sans-serif'
     }}>
       {/* Header */}
-      <header style={{
-        backgroundColor: 'white',
-        padding: '1.5rem 2rem',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' }}>
-          <div style={{
-            fontSize: '0.9rem',
-            color: '#94a3b8',
-            fontWeight: 500,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}>
-            {user.team}
-          </div>
-          <h1 style={{
-            fontWeight: 700,
-            fontSize: '1.75rem',
-            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: 0,
-            lineHeight: '1.2'
-          }}>
-            <Link to={'/main'} style={{ textDecoration: 'none' }}>ChillRate</Link>
-          </h1>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div>
-              <div style={{ fontWeight: 600, color: '#1e293b' }}>Иван Иванов</div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Тренер</div>
-            </div>
-          </div>
-        </div>
-      </header>
+     <HeaderApp></HeaderApp>
 
       {/* Main Content */}
       <main style={{

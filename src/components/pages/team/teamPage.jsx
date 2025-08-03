@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Api from './Api';
+import Api from '../../../service/Api';
+import Security from '../../../service/Securite';
+import HeaderApp from '../../header/HeaderApp';
 
 const getBarColor = (percent) => {
   if (percent >= 75) return '#10b981';
@@ -16,7 +18,7 @@ const UserTableRow = ({ user, teamId }) => {
   useEffect(() => {
     const fetchAnxietyData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = Security.getToken();
         const response = await Api.getUserData(teamId, user.email, token);
         
         if (response && Array.isArray(response) && response.length > 0) {
@@ -288,49 +290,7 @@ const DashboardLayout = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <header style={{
-        backgroundColor: 'white',
-        padding: '1.5rem 2rem',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' }}>
-          <div style={{
-            fontSize: '0.9rem',
-            color: '#94a3b8',
-            fontWeight: 500,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}>
-            {teamName}
-          </div>
-          <h1 style={{
-            fontWeight: 700,
-            fontSize: '1.75rem',
-            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: 0,
-            lineHeight: '1.2'
-          }}>
-            <Link to={'/main'} style={{ textDecoration: 'none' }}>ChillRate</Link>
-          </h1>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div>
-              <div style={{ fontWeight: 600, color: '#1e293b' }}>Иван Иванов</div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Тренер</div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <HeaderApp></HeaderApp>
       <main style={{ 
         padding: '2rem',
         flex: 1,

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import logo from './assets/logo.svg';
-import Api from './Api'; 
+import logo from '../../../assets/logo.svg';
+import Api from '../../../service/Api'; 
 import { useNavigate } from 'react-router-dom';
-
+import Security from '../../../service/Securite';
+import  './auth.css'
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState(''); 
@@ -33,8 +34,9 @@ const AuthPage = () => {
       if (result?.error) {
         setMsg(`Ошибка: ${typeof result.error === 'string' ? result.error : JSON.stringify(result.error)}`);
       } else if (result?.token) {
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('user', result.user);
+        Security.login(result.user,result.token);
+        //localStorage.setItem('token', result.token);
+        //localStorage.setItem('user', result.user);
         setMsg('Успешно!');
         if (isLogin) {
           navigate('/main');
@@ -52,40 +54,24 @@ const AuthPage = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
-      fontFamily: "'Inter', sans-serif"
-    }}>
-      <div style={{
-        backgroundColor: '#fff',
-        padding: '3rem',
-        borderRadius: '20px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-        width: '100%',
-        maxWidth: '400px',
-        textAlign: 'center',
-        fontFamily: "'Inter', sans-serif"
-      }}>
-        <div style={{ color: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', textAlign: 'center' }}>
-          <img src={logo} style={{ width: '400px', height: '200px' }} alt="logo" />
+    <div className='mainDivAuth'>
+      <div className='kardAuth'>
+        <div className='authLogoContainer'>
+          <img src={logo} className='logoImgAuth' alt="logo" />
         </div>
 
-        <h2 style={{ fontWeight: 600, marginBottom: '1.5rem', color: '#1e293b' }}>
+        <h2 className='headCard'>
           {isLogin ? 'Вход в аккаунт' : 'Регистрация'}
         </h2>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleSubmit} className='formAuth'>
           {!isLogin && (
             <input
               type="text"
               placeholder="Имя"
               value={name}
               onChange={e => setName(e.target.value)}
-              style={inputStyle}
+              className='inputStyleAuth'
               required
             />
           )}
@@ -94,7 +80,7 @@ const AuthPage = () => {
             placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            style={inputStyle}
+            className='inputStyleAuth'
             required
           />
           <input
@@ -102,13 +88,14 @@ const AuthPage = () => {
             placeholder="Пароль"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            style={inputStyle}
+            className='inputStyleAuth'
             required
           />
 
           <button
             type="submit"
-            style={{ ...buttonStyle, opacity: working ? 0.7 : 1, pointerEvents: working ? 'none' : 'auto' }}
+            className='buttonStyleAuth'
+            style={{  opacity: working ? 0.7 : 1, pointerEvents: working ? 'none' : 'auto' }}
             disabled={working}
           >
             {working ? (isLogin ? 'Вход...' : 'Регистрация...') : (isLogin ? 'Войти' : 'Зарегистрироваться')}
@@ -121,13 +108,9 @@ const AuthPage = () => {
           </p>
         )}
 
-        <p style={{ marginTop: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
+        <p className='bottomCardAuth'>
           {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}{' '}
-          <span onClick={toggleAuth} style={{
-            color: '#3b82f6',
-            cursor: 'pointer',
-            fontWeight: 500
-          }}>
+          <span onClick={toggleAuth} className='bottomCardContainerAuth'>
             {isLogin ? 'Зарегистрироваться' : 'Войти'}
           </span>
         </p>
@@ -136,25 +119,5 @@ const AuthPage = () => {
   );
 };
 
-const inputStyle = {
-  padding: '0.8rem 1rem',
-  borderRadius: '12px',
-  border: '1px solid #e2e8f0',
-  outline: 'none',
-  fontSize: '0.95rem',
-  backgroundColor: '#f9fafb',
-  transition: 'border-color 0.2s ease',
-};
-
-const buttonStyle = {
-  backgroundColor: '#6366f1',
-  color: '#fff',
-  border: 'none',
-  padding: '0.9rem',
-  borderRadius: '12px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: 'background-color 0.2s ease'
-};
 
 export default AuthPage;

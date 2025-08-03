@@ -2,14 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import Api from './Api.js';
+import Api from '../../../service/Api.js'
+import Security from '../../../service/Securite.js';
+import HeaderApp from '../../header/HeaderApp.jsx';
+import BottomApp from '../../bottom/BottomApp.jsx';
 
 
 const CoachHomePage = () => {
   const [teams, setTeams] = useState([]);
   const totalUsers = teams.reduce((sum, team) => sum + team.clients.length, 0)
   const avgRelax = 59;
-  const token = localStorage.getItem('token');
+  const token = Security.getToken();
   const [isAdding, setIsAdding] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const [loadingTeams, setLoadingTeams] = useState(false);
@@ -109,73 +112,7 @@ const CoachHomePage = () => {
       background: 'linear-gradient(to right, #3b83f60e, #8a5cf610)',
     }}>
       {/* Верхняя панель */}
-      <header style={{
-        backgroundColor: 'white',
-        padding: '1rem 2rem',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          
-          <h1 style={{ 
-            fontWeight: 700, 
-            fontSize: '1.5rem',
-            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            ChillRate
-          </h1>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
-            
-            <div>
-              <div style={{ fontWeight: 600, color: '#1e293b' }}>Иван Иванов</div>
-              <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Тренер</div>
-            </div>
-          </div>
-          <button
-            onClick={() => console.log("Открыть настройки")}
-            style={{
-              backgroundColor: '#f1f5f9',
-              color: '#334155',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.5rem 1rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            ⚙ Настройки
-          </button>
-          <button
-            onClick={() => console.log("Выход")}
-            style={{
-              backgroundColor: '#fee2e286',
-              color: '#b91c1c',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.5rem 1rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-          Выйти
-          </button>
-        </div>
-      </header>
-
+      <HeaderApp></HeaderApp>
       <main style={{
         flex: 1,
         maxWidth: '1200px',
@@ -578,32 +515,7 @@ const CoachHomePage = () => {
         </section>
         
       </main>
-
-      
-      <footer style={{
-          backgroundColor: '#f1f5f9',
-          padding: '2rem',
-          textAlign: 'center',
-          borderTop: '1px solid #e2e8f0',
-          color: '#64748b',
-          fontSize: '0.9rem',
-          marginTop: 'auto'
-      }}>
-          <p style={{
-              marginBottom: '0.5rem',
-              fontWeight: 500,
-              color: '#1e293b'
-          }}>
-              ChillRate © {new Date().getFullYear()}
-          </p>
-          <p style={{ marginBottom: '0.25rem' }}>
-              Сделано с заботой о командах и их прогрессе.
-          </p>
-          <p>
-              <a href="#" style={{ color: '#3b82f6', textDecoration: 'none' }}>Сайт компании "Нейротех"</a> · <a href="#" style={{ color: '#3b82f6', textDecoration: 'none' }}>Информация о датчике</a>
-          </p>
-      </footer>
-
+      <BottomApp></BottomApp>
     </div>
   );
 };
