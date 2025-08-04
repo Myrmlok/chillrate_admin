@@ -34,13 +34,15 @@ const AuthPage = () => {
       if (result?.error) {
         setMsg(`Ошибка: ${typeof result.error === 'string' ? result.error : JSON.stringify(result.error)}`);
       } else if (result?.token) {
-        Security.login(result.user,result.token);
+        
         //localStorage.setItem('token', result.token);
         //localStorage.setItem('user', result.user);
         setMsg('Успешно!');
         if (isLogin) {
+          Security.login(result.user,result.token,isLogin);
           navigate('/main');
         } else {
+          Security.login(result.user,result.token,isLogin);
           navigate('/confirm');
         }
       } else {

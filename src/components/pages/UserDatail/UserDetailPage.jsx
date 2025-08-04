@@ -356,6 +356,7 @@ const UserDetailPage = () => {
                 strokeWidth={2}
                 dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                animationDuration={0}
               />
             </LineChart>
           </ResponsiveContainer>

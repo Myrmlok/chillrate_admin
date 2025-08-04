@@ -6,10 +6,13 @@ class Security{
 
     private static tokenParamName='token';
     private static authParamName='user';
-    static callBack;
-    static login(userData,token){
+    static callBack=(data)=>{};
+    static login(userData,token,isLogin){
         localStorage.setItem(this.tokenParamName, token);
         localStorage.setItem(this.authParamName,JSON.stringify(userData));
+        if(isLogin){
+            this.callBack(userData);
+        }
     }
     static getToken(){
         return localStorage.getItem(this.tokenParamName);

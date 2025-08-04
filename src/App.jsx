@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Await } from 'react-router-dom';
 import CoachHomePage from './components/pages/main/mainPage';
 import DashboardLayout from './components/pages/team/teamPage';
 import UserDetailPage from './components/pages/UserDatail/UserDetailPage';
@@ -7,18 +7,18 @@ import AuthPage from './components/pages/auth/auth';
 import WelcomePage from './components/pages/welcomePage/welcomePage';
 import ConfirmEmailPage from './components/pages/confirmEmail/confirmEmailPage';
 import Security from './service/Securite';
+import Api from './service/Api';
 
 
 
 function App() {
-  const [auth,setAuth]=useState(null);
+  const [auth,setAuth]=useState(Security.getAuth());
   Security.callBack=setAuth;
   useEffect(()=>{
-    const load=async()=>{
-      await Security.getAuthWithCheck();
-    }
+    const load=async ()=>await Security.getAuthWithCheck();
     load();
   },[])
+  
   return (
     <Router>
       <Routes>
