@@ -16,7 +16,10 @@ class Api{
             return response.data;
         })
         .catch((ex)=>{
-            return ex;
+          if(ex.response){
+            return ex.response.data;
+          }
+          return ex
         })
     }
     static async auth(name,email,password){
@@ -27,7 +30,12 @@ class Api{
         }).then((response)=>{
             return response.data;
         })
-        .catch(ex=>ex);
+        .catch(ex=>{
+          if(ex.response.data){
+            return ex.response.data
+          }
+          return ex
+        });
     }
 
     // распределение

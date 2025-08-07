@@ -46,7 +46,7 @@ const AuthPage = () => {
           navigate('/confirm');
         }
       } else {
-        setMsg('нет токена. ' + JSON.stringify(result));
+        setMsg(JSON.stringify(result));
       }
     } catch (ex) {
       setMsg('ошибка запроса: ' + (ex.message || JSON.stringify(ex)));
